@@ -16,13 +16,13 @@ def get_projects():
         url = URL + 'projects'
         r = requests.get(url, headers=HEADERS, verify=False,timeout=PROPERTIES['TIMEOUT'])
         root = ET.fromstring(r.text.encode('utf-8'))
-        for project in root:	
+        for project in root:
             for name in project.findall('name'):
                 project_names.append(name.text)
     except:
         print "Problem with project listing {0}".format(r)
         pass
-    return project_names   
+    return project_names
 
 # Returns list of all the jobids
 def get_jobs_for_project(project_name):
@@ -32,8 +32,8 @@ def get_jobs_for_project(project_name):
     try:
         url = URL + 'jobs'
         payload = { 'project':  project_name }
-        r = requests.get(url, params=payload, headers=HEADERS, verify=False,timeout=PROPERTIES['TIMEOUT'])    
-        root = ET.fromstring(r.text.encode('utf-8'))	
+        r = requests.get(url, params=payload, headers=HEADERS, verify=False,timeout=PROPERTIES['TIMEOUT'])
+        root = ET.fromstring(r.text.encode('utf-8'))
         for job in root:
             job_ids.append( (job.attrib['id'],job.find('name').text) )
     except:
@@ -41,7 +41,7 @@ def get_jobs_for_project(project_name):
         pass
     return job_ids
 
-# API call to get a page of the executions for a particular job id      
+# API call to get a page of the executions for a particular job id
 def get_executions_for_job(job_id,page):
     global PROPERTIES
     global HEADERS
@@ -69,7 +69,7 @@ def get_execution_dates(root):
     except:
         pass
     return execid_dates
-       
+
 #API call to delete an execution by ID
 def delete_execution(execution_id):
     global PROPERTIES
@@ -97,7 +97,7 @@ def delete_executions(execution_ids):
         except:
             pass
         pass
-    
+
 def delete_test(execution_date):
     global PROPERTIES
     global TODAY
@@ -115,9 +115,22 @@ def check_deletion(execid_dates):
 #
 # Main
 #
-setting_filename = sys.argv[1] if len(sys.argv)>1 else 'properties.json'
-with open(setting_filename,'r') as props_file:    
-    PROPERTIES = json.load( props_file )
+#setting_filename = sys.argv[1] if len(sys.argv)>1 else 'properties.json'
+#with open(setting_filename,'r') as props_file:
+#    PROPERTIES = json.load( props_file )
+PROPERTIES = {
+	"RUNDECKSERVER": "localhost",
+	"PORT": 4440,
+	"SSL": False,
+	"API_KEY": sys.argv[1],
+	"API_VERSION": "17",
+	"PAGE_SIZE": 1000,
+	"MAXIMUM_DAYS": sys.argv[2],
+	"TIMEOUT": 60,
+	"DELETE_TIMEOUT": 1200,
+	"MAX_DELETE": 5000,
+	"VERBOSE": False
+}
 
 protocol='http'
 if PROPERTIES['SSL']:
